@@ -1,4 +1,5 @@
 <script>
+	import CodeEditor from './CodeEditor.svelte';
 </script>
 
 <svelte:head>
@@ -12,6 +13,8 @@
 <section>
 	<h1>WebGPU Memory Layout Inspector</h1>
 </section>
+
+<CodeEditor />
 
 <style>
 	section {
