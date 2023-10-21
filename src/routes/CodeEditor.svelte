@@ -134,7 +134,7 @@ struct SceneInfo {
 		}
 
 		&::after,
-		input,
+		& input,
 		textarea {
 			width: auto;
 			min-width: 1em;
