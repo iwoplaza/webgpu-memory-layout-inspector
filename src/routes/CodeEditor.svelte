@@ -1,6 +1,9 @@
 <script lang="ts">
-	import { lexer } from '$lib/lexer';
 	import { Token } from 'tokenizr';
+
+	import AST from '$lib/ast';
+	import { lexer } from '$lib/lexer';
+	import TokenSource from '$lib/tokenSource';
 
 	let codeString = `
 struct SphereObj {
@@ -33,9 +36,21 @@ struct SceneInfo {
 		}
 	}
 
-	$: [codeTokens, lexerError] = computeTokens(codeString);
+	function computeAST(tokens: Token[]) {
+		try {
+			const ast = new AST();
+			ast.parse(new TokenSource(tokens));
+			return [ast, null] as const;
+		} catch (e) {
+			return [null, e?.toString()] as const;
+		}
+	}
 
-	$: console.log(codeTokens);
+	$: [codeTokens, lexerError] = computeTokens(codeString);
+	$: [ast, parserError] = computeAST(codeTokens);
+
+	// $: console.log(codeTokens);
+	$: console.log(ast);
 </script>
 
 <main>
@@ -44,7 +59,7 @@ struct SceneInfo {
 	</label>
 	<div class="line-numbers">
 		{#each codeString.split('\n') as line, idx}
-			<li>{idx}</li>
+			<li>{idx + 1}</li>
 		{/each}
 	</div>
 	<div class="tokens">
@@ -61,6 +76,9 @@ struct SceneInfo {
 </main>
 {#if lexerError !== null}
 	<p class="error-status">{lexerError}</p>
+{/if}
+{#if parserError !== null}
+	<p class="error-status">{parserError}</p>
 {/if}
 
 <style>
