@@ -70,5 +70,5 @@ lexer.rule(/[ \t\r\n]+/, (ctx) => {
 
 // unknown char catch while developing
 lexer.rule(/./, (ctx) => {
-	ctx.ignore();
+	ctx.accept('unknown');
 });

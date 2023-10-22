@@ -3,7 +3,7 @@ import type { Token } from 'tokenizr';
 class TokenSource {
 	private tokens: Token[];
 
-	constructor(tokens: Token[], private readonly ignoreComments = true) {
+	constructor(tokens: Token[], private readonly ignoreTokens = ['comment']) {
 		this.tokens = [...tokens];
 	}
 
@@ -29,7 +29,7 @@ class TokenSource {
 
 	peek(): Token | undefined {
 		// Skipping comments
-		while (this.ignoreComments && this.tokens[0]?.type === 'comment') {
+		while (this.ignoreTokens.includes(this.tokens[0]?.type)) {
 			this.tokens.shift();
 		}
 

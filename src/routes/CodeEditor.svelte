@@ -27,6 +27,8 @@ struct SceneInfo {
   spheres: array<SphereObj, MAX_SPHERES>
 }`;
 
+	let textareaInstance: HTMLTextAreaElement | undefined;
+
 	function computeTokens(input: string) {
 		try {
 			lexer.input(codeString);
@@ -46,22 +48,46 @@ struct SceneInfo {
 		}
 	}
 
+	let cursor = [0, 0];
+
+	async function syncCursorPosition() {
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		const oneCursor = textareaInstance?.selectionStart ?? 0;
+
+		const sub = codeString.substring(0, oneCursor);
+		const lines = sub.split('\n');
+		const linesNoTail = [...lines];
+		linesNoTail[linesNoTail.length - 1] = '';
+
+		cursor = [oneCursor - linesNoTail.join('\n').length, lines.length - 1];
+		console.log(`linear: ${oneCursor}, 2d: ${cursor}`);
+	}
+
 	$: [codeTokens, lexerError] = computeTokens(codeString);
 	$: [ast, parserError] = computeAST(codeTokens);
 
-	// $: console.log(codeTokens);
+	$: console.log(codeTokens);
 	$: console.log(ast);
 </script>
 
+<svelte:window on:keydown={syncCursorPosition} />
+
 <main>
 	<label class="input-sizer stacked" data-value={codeString}>
-		<textarea spellcheck="false" bind:value={codeString} />
+		<textarea
+			bind:this={textareaInstance}
+			spellcheck="false"
+			bind:value={codeString}
+			on:mousedown={syncCursorPosition}
+		/>
 	</label>
 	<div class="line-numbers">
 		{#each codeString.split('\n') as line, idx}
 			<li>{idx + 1}</li>
 		{/each}
 	</div>
+	<div class="cursor" style="--row: {cursor[1]}; --col: {cursor[0]}" />
 	<div class="tokens">
 		{#each codeTokens as token}
 			<span
@@ -161,7 +187,7 @@ struct SceneInfo {
 		}
 
 		&:focus-within {
-			outline: solid 1px #595980;
+			outline: solid 2px #9090c4;
 
 			& textarea:focus {
 				outline: none;
@@ -169,7 +195,18 @@ struct SceneInfo {
 		}
 	}
 
+	.cursor {
+		position: absolute;
+		left: calc(5em + var(--col) * 0.6em);
+		/* left: calc(var(--col) * 0.6em + 5em + 0.07em); */
+		top: calc(var(--row) * var(--line-height) + 0.35em);
+		width: 1px;
+		height: 1.2em;
+		background-color: white;
+	}
+
 	.token {
+		pointer-events: none;
 		position: absolute;
 		left: calc(var(--col) * 0.6em + 5em + 0.07em);
 		top: calc(var(--line) * var(--line-height) + 0.25em);
