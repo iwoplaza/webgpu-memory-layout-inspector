@@ -1,4 +1,5 @@
 <script>
+	import AnalysisResult from './AnalysisResult.svelte';
 	import CodeEditor from './CodeEditor.svelte';
 </script>
 
@@ -15,6 +16,8 @@
 </section>
 
 <CodeEditor />
+
+<AnalysisResult />
 
 <style>
 	section {

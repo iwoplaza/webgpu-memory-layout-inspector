@@ -4,6 +4,7 @@
 	import AST from '$lib/ast';
 	import { lexer } from '$lib/lexer';
 	import TokenSource from '$lib/tokenSource';
+	import DataTypeRepository from '$lib/artifactRepository';
 
 	let codeString = `
 struct SphereObj {
@@ -41,7 +42,8 @@ struct SceneInfo {
 	function computeAST(tokens: Token[]) {
 		try {
 			const ast = new AST();
-			ast.parse(new TokenSource(tokens));
+			const dataTypeRepo = new DataTypeRepository();
+			ast.parse(new TokenSource(tokens), dataTypeRepo);
 			return [ast, null] as const;
 		} catch (e) {
 			return [null, e?.toString()] as const;
